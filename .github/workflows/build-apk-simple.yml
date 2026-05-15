@@ -40,6 +40,14 @@ jobs:
             libbz2-dev \
             liblzma-dev
         
+        # 🔥 设置 Java 17 为默认（关键修复）
+        sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+        sudo update-alternatives --set javac /usr/lib/jvm/java-17-openjdk-amd64/bin/javac
+        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+        export PATH=$JAVA_HOME/bin:$PATH
+        echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+        echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_PATH
+        
         # 安装Android SDK命令行工具
         mkdir -p $HOME/android-sdk/cmdline-tools/latest
         curl -o commandlinetools-linux.zip https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
@@ -47,13 +55,17 @@ jobs:
         mv $HOME/android-sdk/cmdline-tools/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/
         rm commandlinetools-linux.zip
         
-        # 设置环境变量
+        # 设置 Android SDK 环境变量
         echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
         echo "PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_ENV
-
-        yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+        echo "PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+        
+        # 🔥 创建软链接，让 Buildozer 能找到 sdkmanager
         ln -s $HOME/android-sdk/cmdline-tools/latest $HOME/android-sdk/tools
+        
+        # 🔥 现在用 Java 17 接受许可证并安装 platform-tools
+        yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
         $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools"
     
     - name: Install Python dependencies
