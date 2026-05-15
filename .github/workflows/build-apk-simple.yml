@@ -52,7 +52,9 @@ jobs:
         echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
         echo "PATH=$PATH:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_ENV
 
-        yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+        ln -s $HOME/android-sdk/cmdline-tools/latest $HOME/android-sdk/tools
+        $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools"
     
     - name: Install Python dependencies
       run: |
